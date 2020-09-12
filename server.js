@@ -1,9 +1,9 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const jwt = require("jsonwebtoken");
+//const bodyParser = require("body-parser");
+//const jwt = require("jsonwebtoken");
 const server = express();
 
-const SERVER_KEY = "manuelDelilahResto";
+//const SERVER_KEY = "manuelDelilahResto";
 
 const port = 3000; 
 
