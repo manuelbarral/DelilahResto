@@ -39,3 +39,19 @@ server.get("/productos/:id", (req, res) => {
         res.status(200).json(results);
     })
 })
+
+server.put("/productos/:id", (req, res) => {
+    connection.query("UPDATE productos SET nombre = ?, precio = ? WHERE id = ?",
+    {replacements: [req.body.nombre, req.body.precio, req.params.id], type: Sequelize.QueryTypes.UPDATE})
+    .then((results)=> {
+        res.status(201).json(results);
+    })
+})
+
+server.delete("/productos/:id", (req, res) => {
+    connection.query("DELETE FROM productos WHERE id = ?",
+    {replacements: [req.params.id], type: Sequelize.QueryTypes.DELETE})
+    .then((results)=> {
+        res.status(204).json(results);
+    })
+})
