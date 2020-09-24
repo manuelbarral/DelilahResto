@@ -4,17 +4,21 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const connection = new Sequelize("mysql://root@localhost:3306/delilah_resto");
-//const SERVER_KEY = "manuelDelilahResto";
 
-const port = 3000; 
+require("dotenv").config();
 
-server.listen(port, ()=> {
-    console.log(`Server listening at http://localhost:${port}`)
+//process.env
+const port = process.env.PORT;
+const host = process.env.HOST;
+const server_key = process.env.SERVER_KEY;
+
+server.listen(port, host, ()=> {
+    console.log(`Server listening at http://${host}:${port}`);
 });
 
 server.use(bodyParser.json());
 
-//Endpoints productos
+//Endpoints de productos
 server.get("/products", (req, res) => {
     connection.query("SELECT * FROM productos",
     {type: Sequelize.QueryTypes.SELECT})
@@ -52,5 +56,15 @@ server.delete("/products/:id", (req, res) => {
     {replacements: [req.params.id], type: Sequelize.QueryTypes.DELETE})
     .then(()=> {
         res.status(200).json("Producto eliminado con éxito");
+    })
+})
+
+// Endpoints de usuarios
+
+server.post("/users", (req, res) => {
+    connection.query("INSERT INTO usuarios (usuarios, nombre, apellido, email, telefono, direccion, admin) VALUES (?,?,?,?,?,?,?)",
+    {replacements: [req.body.usuario, req.body.nombre, req.body.apellido, req.body.email, req.body.telefono, req.body.direccion, req.body.admin]})
+    .then(()=> {
+        res.status(200).json("Producto creado con éxito");
     })
 })
