@@ -1,70 +1,48 @@
 const express = require("express");
 const server = express();
 const bodyParser = require("body-parser");
+
 const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const connection = new Sequelize("mysql://root@localhost:3306/delilah_resto");
 
+const middleware = require("./middlewares");
+
 require("dotenv").config();
 
 //process.env
-const port = process.env.PORT;
-const host = process.env.HOST;
-const server_key = process.env.SERVER_KEY;
+const PORT = process.env.PORT;
+const HOST = process.env.HOST;
 
 server.listen(port, host, ()=> {
-    console.log(`Server listening at http://${host}:${port}`);
+    console.log(`Server listening at http://${HOST}:${PORT}`);
 });
 
 server.use(bodyParser.json());
 
-//login
-server.post("/login", (req, res) => {
-    const userName = req.body.userName;
-    const password = String(req.body.password);
-    const token = validUser(userName, password);
-    if(token) {
-        res.status(200).json({token});
-    } else {
-        res.status(401).send("Usuario invalido");
-    }
-});
-
-function validUser(userName, password) {
-    const user = users.find((element) => {
-        if(user === element.userName && String(password) === element.password) {
-            return true;
-        } else {
-            return false;
-        }
-    });
-
-    if(user) {
-        const token = jwt.sign({userName, password}, server_key);
-        return token;
-    } else {
-        return false;
-    }
-};
-
-//Endpoints de productos
-server.get("/products", (req, res) => {
+//Endpoints de products
+server.get("/products", middleware.verifyLogin, (req, res) => {
     connection.query("SELECT * FROM products",
     {type: Sequelize.QueryTypes.SELECT})
     .then((results)=> {
-        res.status(200).json(results);
+        if(results.length !== 0) {
+            res.json(results);
+        } else {
+            res.status(404).json({ok: "false", res: "Sin productos registrados!"});
+        }
     });
 });
 
-server.post("/products", (req, res) => {
+server.post("/products", middleware.verifyLogin, middleware.adminPermission, middleware.validateInfoProduct, (req, res) => {
     connection.query("INSERT INTO products (name, price) VALUES (?,?)",
     {replacements: [req.body.name, req.body.price]})
-    .then(()=> {
-        res.status(200).json("Producto creado con éxito");
+    .then((results)=> {
+        console.log("Producto creado con éxito", results);
+        res.status(200).json({ok: "true", res: "Producto creado con éxito"});
     });
 });
 
-server.get("/products/:id", (req, res) => {
+server.get("/products/:id", middleware.verifyLogin, middleware.verifyIdProducts, (req, res) => {
     connection.query("SELECT * FROM products WHERE id = :id",
     {replacements: {id: req.params.id }, type: connection.QueryTypes.SELECT})
     .then((results)=> {
@@ -72,36 +50,23 @@ server.get("/products/:id", (req, res) => {
     });
 });
 
-server.put("/products/:id", (req, res) => {
+server.put("/products/:id", middleware.verifyLogin, middleware.adminPermission, middleware.verifyIdProducts, middleware.validateInfoProduct, (req, res) => {
     connection.query("UPDATE products SET name = ?, price = ?, id = ? WHERE id = ?",
-    {replacements: [req.body.name, req.body.price, req.body.id ,req.params.id], type: Sequelize.QueryTypes.UPDATE})
-    .then(()=> {
-        res.status(201).json("Producto actualizado");
+    {replacements: [req.body.name, req.body.price,req.params.id], type: Sequelize.QueryTypes.UPDATE})
+    .then((results)=> {
+        res.status(201).json({ok: "true", res: "Producto actualizado", results});
     });
 });
 
-server.delete("/products/:id", (req, res) => {
+server.delete("/products/:id", middleware.verifyLogin, middleware.adminPermission, middleware.verifyIdProducts, (req, res) => {
     connection.query("DELETE FROM products WHERE id = ?",
     {replacements: [req.params.id], type: Sequelize.QueryTypes.DELETE})
     .then(()=> {
-        res.status(200).json("Producto eliminado con éxito");
+        res.status(204).json("Producto eliminado con éxito");
     });
 });
 
-// Endpoints de usuarios
-
-server.get("/users", (req, res) => {
-    connection.query("SELECT * FROM users",
-    {type: Sequelize.QueryTypes.SELECT})
-    .then((results)=> {
-        res.status(200).json(results);
-    });
-});
-
-server.post("/users", (req, res) => {
-    connection.query("INSERT INTO users (userName, password, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)",
-    {replacements: [req.body.userName, req.body.password, req.body.name, req.body.lastname, req.body.email, req.body.telephone, req.body.address, req.body.admin]})
-    .then(()=> {
-        res.status(200).json("Producto creado con éxito");
-    });
+// Endpoints de users
+server.post("/users/signup", middleware.validateInfoUser, (req, res) => {
+    
 });
