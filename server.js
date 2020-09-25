@@ -99,8 +99,8 @@ server.get("/users", (req, res) => {
 });
 
 server.post("/users", (req, res) => {
-    connection.query("INSERT INTO users (user, password, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)",
-    {replacements: [req.body.user, req.body.password, req.body.name, req.body.lastname, req.body.email, req.body.telephone, req.body.address, req.body.admin]})
+    connection.query("INSERT INTO users (userName, password, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)",
+    {replacements: [req.body.userName, req.body.password, req.body.name, req.body.lastname, req.body.email, req.body.telephone, req.body.address, req.body.admin]})
     .then(()=> {
         res.status(200).json("Producto creado con éxito");
     });
