@@ -54,8 +54,8 @@ function validateInfoProduct(req, res, next) {
 };
 
 function validateInfoUser(req, res, next) {
-    const {userName, password, name, lastname, email, telephone, address} = req.body;
-    if(!userName || !password || !name || !lastname || !email || !telephone || !address) {
+    const {userName, password, name, lastname, email, telephone, address, admin} = req.body;
+    if(!userName || !password || !name || !lastname || !email || !telephone || !address || !admin) {
         res.status(400).json({ok: "false", res: "Completar todos los datos para crear la cuenta"});
     } else {
         next();
