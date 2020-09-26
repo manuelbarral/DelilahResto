@@ -13,6 +13,7 @@ require("dotenv").config();
 //process.env
 const PORT = process.env.PORT;
 const HOST = process.env.HOST;
+const SERVER_KEY = process.env.SERVER_KEY;
 
 server.listen(port, host, ()=> {
     console.log(`Server listening at http://${HOST}:${PORT}`);
@@ -67,6 +68,74 @@ server.delete("/products/:id", middleware.verifyLogin, middleware.adminPermissio
 });
 
 // Endpoints de users
+server.get("/users", middleware.verifyLogin, middleware.adminPermission, (req, res) => {
+    connection.query("SELECT * FROM users",
+    {type: Sequelize.QueryTypes.SELECT})
+    .then((results) => {
+        if(results.length !== undefined) {
+            res.json(results);
+        } else {
+            res.status(404).json({ok: "false", res: "No hay usuarios registrados"});
+        }
+    });
+});
+
+server.get("/users/myinfo", middleware.verifyLogin, (req, res) => {
+    const token = req.headers.authorization.split(" ")[1];
+    const verifyToken = jwt.verify(token, SERVER_KEY);
+    connection.query("SELECT * FROM users WHERE userName = ?",
+    {replacements: [verifyToken.userName], type: Sequelize.QueryTypes.SELECT})
+    .then((user) => {
+        res.json(user);
+    });
+});
+
+server.get("/users/:userName", middleware.verifyLogin, middleware.adminPermission, (req, res) => {
+    connection.query("SELECT * FROM users WHERE userName = ?",
+    {replacements: [req.params.userName], type: Sequelize.QueryTypes.SELECT})
+    .then((results) => {
+        if(results.length > 0) {
+            res.status(200).json(results);
+        } else {
+            res.status(404).json({ok: "false", res: "Usuario no existe"});
+        }
+    });
+});
+
 server.post("/users/signup", middleware.validateInfoUser, (req, res) => {
-    
+    connection.query("SELECT * FROM users WHERE userName = ?", 
+    {replacements: [req.body.userName], type: Sequelize.QueryTypes.SELECT})
+    .then((user) => {
+        if(user > 0) {
+            res.status(409).json({ok: "false", res: "UserName no disponible. Ingrese uno nuevo."});
+        } else {
+            connection.query("INSERT INTO users (userName, password, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)",
+            {replacements: [req.body.userName, req.body.password, req.body.name, req.body.lastname, req.body.email, req.body.telephone, req.body.address, req.body.admin]})
+            .then((results) => {
+                res.status(200).json({ok: "true", res: "Usuario creado con éxito", results});
+            })
+        }
+    });
+});
+
+server.post("/users/login", middleware.validateUserPassword, (req, res) => {
+    const {userName, password} = req.body;
+    const token = jwt.sign({userName, password}, SERVER_KEY);
+    res.status(200).json({token});
+});
+
+server.put("/users/:userName", middleware.verifyLogin, middleware.adminPermission, middleware.validateInfoUser, (req, res) => {
+    connection.query("UPDATE users SET userName = ?, password = ?, name = ?, lastname = ?, email = ?, telephone = ?, address = ?, admin = ? WHERE userName = ?",
+    {replacements: [req.body.userName, req.body.password, req.body.name, req.body.lastname, req.body.email, req.body.telephone, req.body.address, req.body.admin, req.params.userName]})
+    .then((results) => {
+        res.status(201).json({ok: "true", res: "Usuario actualizado", results});
+    })
+});
+
+server.delete("/users/:userName", middleware.verifyLogin, middleware.adminPermission, (req, res) => {
+    connection.query("DELETE FROM users WHERE userName = ?",
+    {replacements: [req.params.userName], type: Sequelize.QueryTypes.DELETE})
+    .then(() => {
+        res.status(204).json("Usuario eliminado con éxito");
+    });
 });
