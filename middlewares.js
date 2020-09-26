@@ -74,11 +74,34 @@ function validateUserPassword(req, res, next) {
     });
 };
 
+function verifyIdOrders(req, res, next) {
+    connection.query("SELECT * FROM orders WHERE id = ?",
+    {replacements: [req.params.id], type: Sequelize.QueryTypes.SELECT})
+    .then((order) => {
+        if(order !== 0) {
+            next();
+        } else {
+            res.status(404).json({ok: "false", res: "No existe pedido con ese id"});
+        }
+    });
+};
+
+function validateInfoOrder(req, res, next) {
+    const {id, name, price, paymentMethod, address} = req.body;
+    if(!id || !name || !price || !paymentMethod || !address) {
+        res.status(400).json({ok: "false", res: "Ingresar todos los datos para crear un nuevo pedido"});
+    } else {
+        next();
+    }
+};
+
 module.exports = {
     verifyLogin,
     adminPermission,
     validateInfoProduct,
     verifyIdProducts,
     validateInfoUser,
-    validateUserPassword
+    validateUserPassword,
+    verifyIdOrders,
+    validateInfoOrder
 }
