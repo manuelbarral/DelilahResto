@@ -62,10 +62,23 @@ function validateInfoUser(req, res, next) {
     }
 };
 
+function validateUserPassword(req, res, next) {
+    connection.query("SELECT * FROM users WHERE userName = ?",
+    {replacements: [req.body.userName], type: Sequelize.QueryTypes.SELECT})
+    .then((user) => {
+        if(user.password === req.body.password) {
+            next();
+        } else {
+            res.status(401).json({ok: "false", res: "Usuario o contraseña incorrecta"});
+        }
+    });
+};
+
 module.exports = {
     verifyLogin,
     adminPermission,
     validateInfoProduct,
     verifyIdProducts,
-    validateInfoUser
+    validateInfoUser,
+    validateUserPassword
 }
