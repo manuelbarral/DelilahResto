@@ -7,6 +7,7 @@ const Sequelize = require("sequelize");
 const connection = new Sequelize("mysql://root@localhost:3306/delilah_resto");
 
 const middleware = require("./middlewares");
+const Connection = require("mysql2/typings/mysql/lib/Connection");
 
 require("dotenv").config();
 
@@ -138,4 +139,33 @@ server.delete("/users/:userName", middleware.verifyLogin, middleware.adminPermis
     .then(() => {
         res.status(204).json("Usuario eliminado con éxito");
     });
+});
+
+// Endpoints de pedidos
+server.get("/orders", middleware.verifyLogin, middleware.adminPermission, (req, res) => {
+    connection.query("SELECT users.id, users.address, orders.state, orders.dateOrder, orders.description, orders.price, orders.paymentMethod, products.name, ordersInfo.orderId, ordersInfo.productId FROM users INNER JOIN orders ON orders.userId = users.id JOIN ordersInfo ON ordersInfo.orderId = orders.id JOIN products ON products.id = ordersInfo.productId ORDER BY orderId ASC",
+    {type: Sequelize.QueryTypes.SELECT})
+    .then((results) => {
+        if(results.length > 0) {
+            res.status(200).json({results});
+        } else {
+            res.status(404).json({ok: "false", res: "No hay pedidos registrados"});
+        }
+    });
+});
+
+server.get("/orders/:id", middleware.verifyLogin, middleware.adminPermission, middleware.verifyIdOrders, (req, res) => {
+    connection.query("SELECT * FROM orders WHERE id = ?",
+    {replacements: [req.params.id], type: Sequelize.QueryTypes.SELECT})
+    .then((order) => {
+        if(order.length > 0) {
+            res.status(200).json(order);
+        } else {
+            res.status(404).json({ok: "false", res: "No existe pedido registrado con ese id"});
+        }
+    });
+});
+
+server.post("/orders", middleware.verifyLogin, middleware.validateInfoOrder, (req, res) => {
+    
 });
