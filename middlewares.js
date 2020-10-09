@@ -21,12 +21,12 @@ function verifyLogin(req, res, next) {
 
 function verifyIdProducts(req, res, next) {
 	connection
-		.query('SELECT * FROM products WHERE id = ?', {
+		.query('SELECT * FROM products WHERE id_product = ?', {
 			replacements: [req.params.id],
 			type: connection.QueryTypes.SELECT,
 		})
 		.then((product) => {
-			if (product[0].id !== 0) {
+			if (product[0].id_product !== 0) {
 				next();
 			} else {
 				res
@@ -71,7 +71,7 @@ function validateInfoProduct(req, res, next) {
 function validateInfoUser(req, res, next) {
 	const {
 		userName,
-		password,
+		psw,
 		name,
 		lastname,
 		email,
@@ -81,7 +81,7 @@ function validateInfoUser(req, res, next) {
 	} = req.body;
 	if (
 		!userName ||
-		!password ||
+		!psw ||
 		!name ||
 		!lastname ||
 		!email ||
@@ -104,7 +104,7 @@ function validateUserPassword(req, res, next) {
 			type: connection.QueryTypes.SELECT,
 		})
 		.then((user) => {
-			if (user[0].password === req.body.password) {
+			if (user[0].psw === req.body.psw) {
 				next();
 			} else {
 				res.status(401).json('Usuario o contraseña incorrecta');
@@ -114,22 +114,22 @@ function validateUserPassword(req, res, next) {
 
 function verifyIdOrders(req, res, next) {
 	connection
-		.query('SELECT * FROM orders WHERE id = ?', {
+		.query('SELECT * FROM orders WHERE id_order = ?', {
 			replacements: [req.params.id],
 			type: connection.QueryTypes.SELECT,
 		})
 		.then((order) => {
-			if (order !== 0) {
+			if (order.id_order !== 0) {
 				next();
 			} else {
-				res.status(404).json('No existe pedido con ese id');
+				res.status(404).json('No existe pedido!');
 			}
 		});
 }
 
 function validateInfoOrder(req, res, next) {
-	const {id, name, price, paymentMethod, address} = req.body;
-	if (!id || !name || !price || !paymentMethod || !address) {
+	const {products, paymentMethod} = req.body;
+	if ((!products, !paymentMethod)) {
 		res
 			.status(400)
 			.json('Ingresar todos los datos para crear un nuevo pedido');
