@@ -9,6 +9,7 @@ const connection = new Sequelize(
 );
 
 const middleware = require('./middlewares');
+const orders = require('./orders');
 
 require('dotenv').config();
 
@@ -52,7 +53,7 @@ server.get(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('SELECT * FROM products WHERE id = :id', {
+			.query('SELECT * FROM products WHERE id_product = :id', {
 				replacements: {id: req.params.id},
 				type: connection.QueryTypes.SELECT,
 			})
@@ -86,10 +87,17 @@ server.put(
 	middleware.validateInfoProduct,
 	(req, res) => {
 		connection
-			.query('UPDATE products SET name = ?, price = ? WHERE id = ?', {
-				replacements: [req.body.name, req.body.price, req.params.id],
-				type: connection.QueryTypes.UPDATE,
-			})
+			.query(
+				'UPDATE products SET name = ?, price = ? WHERE id_product = ?',
+				{
+					replacements: [
+						req.body.name,
+						req.body.price,
+						req.params.id,
+					],
+					type: connection.QueryTypes.UPDATE,
+				}
+			)
 			.then(() => {
 				res.status(201).json('Producto actualizado');
 			});
@@ -103,12 +111,12 @@ server.delete(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('DELETE FROM products WHERE id = ?', {
+			.query('DELETE FROM products WHERE id_product = ?', {
 				replacements: [req.params.id],
 				type: connection.QueryTypes.DELETE,
 			})
 			.then(() => {
-				res.status(204).json('Producto eliminado con éxito');
+				res.status(204).json('Producto eliminado con éxito!');
 			});
 	}
 );
@@ -133,32 +141,37 @@ server.get(
 	}
 );
 
-server.get('/users/myinfo', middleware.verifyLogin, (req, res) => {
-	const token = req.headers.authorization.split(' ')[1];
-	const verifyToken = jwt.verify(token, SERVER_KEY);
-	connection
-		.query('SELECT * FROM users WHERE userName = ?', {
-			replacements: [verifyToken.userName],
-			type: connection.QueryTypes.SELECT,
-		})
-		.then((user) => {
-			res.json(user);
-		});
-});
-
 server.get(
-	'/users/:userName',
+	'/users/:userName/myinfo',
 	middleware.verifyLogin,
-	middleware.adminPermission,
 	(req, res) => {
 		connection
 			.query('SELECT * FROM users WHERE userName = ?', {
 				replacements: [req.params.userName],
 				type: connection.QueryTypes.SELECT,
 			})
-			.then((results) => {
-				if (results.length > 0) {
-					res.status(200).json(results);
+			.then((user) => {
+				if (user.id_user > 0 && user.admin === 'false') {
+					res.status(200).json(user);
+				} else {
+					res.status(404).json('Usuario no existe');
+				}
+			});
+	}
+);
+
+server.get(
+	'/users/admin/:userName/myinfo',
+	middleware.verifyLogin,
+	(req, res) => {
+		connection
+			.query('SELECT * FROM users WHERE userName = ?', {
+				replacements: [req.params.userName],
+				type: connection.QueryTypes.SELECT,
+			})
+			.then((user) => {
+				if (user.id_user > 0 && user.admin === 'true') {
+					res.status(200).json(user);
 				} else {
 					res.status(404).json('Usuario no existe');
 				}
@@ -177,6 +190,7 @@ server.post(
 					type: connection.QueryTypes.SELECT,
 				})
 				.then((user) => {
+					console.log(user);
 					if (user.length > 0) {
 						res
 							.status(409)
@@ -184,11 +198,11 @@ server.post(
 					} else {
 						connection
 							.query(
-								'INSERT INTO users (userName, password, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)',
+								'INSERT INTO users (userName, psw, name, lastname, email, telephone, address, admin) VALUES (?,?,?,?,?,?,?,?)',
 								{
 									replacements: [
 										req.body.userName,
-										req.body.password,
+										req.body.psw,
 										req.body.name,
 										req.body.lastname,
 										req.body.email,
@@ -213,8 +227,8 @@ server.post(
 	'/users/login',
 	middleware.validateUserPassword,
 	(req, res) => {
-		const {userName, password} = req.body;
-		const token = jwt.sign({userName, password}, SERVER_KEY);
+		const {userName, psw} = req.body;
+		const token = jwt.sign({userName, psw}, SERVER_KEY);
 		res.status(200).json({token});
 	}
 );
@@ -227,11 +241,11 @@ server.put(
 	(req, res) => {
 		connection
 			.query(
-				'UPDATE users SET userName = ?, password = ?, name = ?, lastname = ?, email = ?, telephone = ?, address = ?, admin = ? WHERE userName = ?',
+				'UPDATE users SET userName = ?, psw = ?, name = ?, lastname = ?, email = ?, telephone = ?, address = ?, admin = ? WHERE userName = ?',
 				{
 					replacements: [
 						req.body.userName,
-						req.body.password,
+						req.body.psw,
 						req.body.name,
 						req.body.lastname,
 						req.body.email,
@@ -259,7 +273,7 @@ server.delete(
 				type: connection.QueryTypes.DELETE,
 			})
 			.then(() => {
-				res.status(204).json('Uusario eliminado con éxito!');
+				res.status(204).json('Usuario eliminado con éxito!');
 			});
 	}
 );
@@ -279,9 +293,7 @@ server.get(
 				if (results.length > 0) {
 					res.status(200).json({results});
 				} else {
-					res
-						.status(404)
-						.json({ok: 'false', res: 'No hay pedidos registrados'});
+					res.status(404).json('No hay pedidos registrados');
 				}
 			});
 	}
@@ -302,10 +314,9 @@ server.get(
 				if (order.length > 0) {
 					res.status(200).json(order);
 				} else {
-					res.status(404).json({
-						ok: 'false',
-						res: 'No existe pedido registrado con ese id',
-					});
+					res
+						.status(404)
+						.json('No existe pedido registrado con ese id');
 				}
 			});
 	}
@@ -315,5 +326,5 @@ server.post(
 	'/orders',
 	middleware.verifyLogin,
 	middleware.validateInfoOrder,
-	(req, res) => {}
+	orders.saveOrder
 );
