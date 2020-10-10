@@ -21,7 +21,7 @@ function verifyLogin(req, res, next) {
 
 function verifyIdProducts(req, res, next) {
 	connection
-		.query('SELECT * FROM products WHERE id_product = ?', {
+		.query('SELECT * FROM products WHERE id = ?', {
 			replacements: [req.params.id],
 			type: connection.QueryTypes.SELECT,
 		})
@@ -114,12 +114,12 @@ function validateUserPassword(req, res, next) {
 
 function verifyIdOrders(req, res, next) {
 	connection
-		.query('SELECT * FROM orders WHERE id_order = ?', {
+		.query('SELECT * FROM orders WHERE id = ?', {
 			replacements: [req.params.id],
 			type: connection.QueryTypes.SELECT,
 		})
 		.then((order) => {
-			if (order.id_order !== 0) {
+			if (order.id !== 0) {
 				next();
 			} else {
 				res.status(404).json('No existe pedido!');
