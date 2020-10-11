@@ -53,7 +53,7 @@ server.get(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('SELECT * FROM products WHERE id_product = :id', {
+			.query('SELECT * FROM products WHERE id = :id', {
 				replacements: {id: req.params.id},
 				type: connection.QueryTypes.SELECT,
 			})
@@ -87,17 +87,10 @@ server.put(
 	middleware.validateInfoProduct,
 	(req, res) => {
 		connection
-			.query(
-				'UPDATE products SET name = ?, price = ? WHERE id_product = ?',
-				{
-					replacements: [
-						req.body.name,
-						req.body.price,
-						req.params.id,
-					],
-					type: connection.QueryTypes.UPDATE,
-				}
-			)
+			.query('UPDATE products SET name = ?, price = ? WHERE id = ?', {
+				replacements: [req.body.name, req.body.price, req.params.id],
+				type: connection.QueryTypes.UPDATE,
+			})
 			.then(() => {
 				res.status(201).json('Producto actualizado');
 			});
@@ -111,7 +104,7 @@ server.delete(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('DELETE FROM products WHERE id_product = ?', {
+			.query('DELETE FROM products WHERE id = ?', {
 				replacements: [req.params.id],
 				type: connection.QueryTypes.DELETE,
 			})
@@ -151,7 +144,7 @@ server.get(
 				type: connection.QueryTypes.SELECT,
 			})
 			.then((user) => {
-				if (user.id_user > 0 && user.admin === 'false') {
+				if (user[0].id > 0 && user[0].admin === 'false') {
 					res.status(200).json(user);
 				} else {
 					res.status(404).json('Usuario no existe');
@@ -170,7 +163,7 @@ server.get(
 				type: connection.QueryTypes.SELECT,
 			})
 			.then((user) => {
-				if (user.id_user > 0 && user.admin === 'true') {
+				if (user[0].id > 0 && user[0].admin === 'true') {
 					res.status(200).json(user);
 				} else {
 					res.status(404).json('Usuario no existe');
@@ -286,7 +279,7 @@ server.get(
 	(req, res) => {
 		connection
 			.query(
-				'SELECT users.id, users.address, orders.state, orders.dateOrder, orders.description, orders.price, orders.paymentMethod, products.name, ordersInfo.orderId, ordersInfo.productId FROM users INNER JOIN orders ON orders.userId = users.id JOIN ordersInfo ON ordersInfo.orderId = orders.id JOIN products ON products.id = ordersInfo.productId ORDER BY orderId ASC',
+				'SELECT orders.state, orders.dateOrder, orders.id, orders.description, orders.paymentMethod, orders.price, users.name,users.lastname, users.address FROM users INNER JOIN orders ON orders.id_user  = users.id',
 				{type: connection.QueryTypes.SELECT}
 			)
 			.then((results) => {
@@ -322,9 +315,73 @@ server.get(
 	}
 );
 
+server.get(
+	'/orders/:userName/myOrder',
+	middleware.verifyLogin,
+	(req, res) => {
+		const token = req.headers.authorization.split(' ')[1];
+		verifyToken = jwt.verify(token, SERVER_KEY);
+		connection
+			.query(
+				'SELECT orders.state, orders.dateOrder, orders.id, orders.description, orders.paymentMethod, orders.price, users.name, users.lastname, users.address FROM users INNER JOIN orders ON orders.id_user  = users.id WHERE userName = ?',
+				{
+					replacements: [verifyToken.userName],
+					type: connection.QueryTypes.SELECT,
+				}
+			)
+			.then((results) => {
+				if (results) {
+					res.status(200).json(results);
+				} else {
+					res
+						.status(404)
+						.json('Parece que no has hecho ningún pedido por ahora.');
+				}
+			});
+	}
+);
+
 server.post(
 	'/orders',
 	middleware.verifyLogin,
 	middleware.validateInfoOrder,
 	orders.saveOrder
+);
+
+server.patch(
+	'/orders/:id',
+	middleware.verifyLogin,
+	middleware.adminPermission,
+	middleware.verifyIdOrders,
+	(req, res) => {
+		connection
+			.query('UPDATE orders SET state = ? WHERE id = ?', {
+				replacements: [req.body.state, req.params.id],
+			})
+			.then(() => {
+				res.status(201).json('Estado de pedido actualizado');
+			});
+	}
+);
+
+server.delete(
+	'/orders/:id',
+	middleware.verifyLogin,
+	middleware.adminPermission,
+	middleware.verifyIdOrders,
+	(req, res) => {
+		connection
+			.query('DELETE FROM infoorders WHERE id_order= :id', {
+				replacements: {id: req.params.id},
+			})
+			.then(() => {
+				connection
+					.query('DELETE FROM orders WHERE id= :id', {
+						replacements: {id: req.params.id},
+					})
+					.then(() => {
+						res.status(204);
+					});
+			});
+	}
 );
