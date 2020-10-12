@@ -76,7 +76,7 @@ En el archivo _tables.sql_ encontrarás las estructuras de las tablas para la cr
 
   _Ejecuta el archivo ***server.js*** automáticamente cada vez que guardas el archivo. Detrás de este comando trabaja 'nodemon'_.
 
-  > Ambos comandos ejecutarlos desde la consola.
+  > Ambos comandos ejecutarlos desde la terminal.
 
 - Inicia Xampp y una vez en el panel de control haz click en los botones _start_ de las filas Apache y MySQL.
 
