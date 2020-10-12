@@ -24,7 +24,7 @@ server.listen(PORT, HOST, () => {
 
 server.use(bodyParser.json());
 
-//Endpoints de products
+// product endpoints
 server.get('/products', middleware.verifyLogin, (req, res) => {
 	try {
 		connection
@@ -114,7 +114,7 @@ server.delete(
 	}
 );
 
-// Endpoints de users
+// user endpoints
 server.get(
 	'/users',
 	middleware.verifyLogin,
@@ -271,7 +271,7 @@ server.delete(
 	}
 );
 
-// Endpoints de pedidos
+// order endpoints
 server.get(
 	'/orders',
 	middleware.verifyLogin,
