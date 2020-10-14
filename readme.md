@@ -89,7 +89,7 @@ En el archivo _tables.sql_ encontrarás las estructuras de las tablas para la cr
 
 Encontrarás los endpoints en el archivo **_*spec.yaml*_**.
 
-> Puedes leer el archivo _spec.yaml_ directamente desde swagger editor o si utilizas _Visual Studio Code_ oprimiendo las teclas Ctrl+Shift+P se abrirá la paleta de comandos y escribiendo 'Markdown: Open Preview to the Side' podrás leerlo más cómodamente.
+> Puedes leer el archivo _spec.yaml_ directamente desde swagger editor.
 
 ### Formatos _JSON_
 
