@@ -1,0 +1,1224 @@
+openapi: 3.0.2
+
+info:
+  title: Delilah Resto API
+  description: Este documento brinda información de los métodos de la API de Delilah Resto.
+  contact:
+    email: manuba9017@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:3000
+    description: Server de desarrollo
+  
+paths:
+
+  #Endpoints de productos
+  /products:
+    get:
+      tags:
+        - PRODUCTOS
+      summary: Método para obtener todos los productos
+      description: Devuelve un listado con todos los productos.
+      responses:
+        200:
+          description: Se encontraron resultados en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/allProducts"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se ha encontrado una lista.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+                    
+    post:
+      tags:
+        - PRODUCTOS
+      summary: Método para crear un nuevo producto
+      description: Se envian los datos a través de un request body y si el request es correcto se crea un nuevo producto.
+      requestBody:
+        description: Se envian los datos para crear un nuevo producto.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestProduct'
+        required: true
+      responses:
+        201:
+          description: El producto se creó satisfactoriamente.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/successRequestProduct"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+                
+                    
+  /products/{id}:
+    get:
+      tags:
+        - PRODUCTOS
+      summary: Método para obtener un solo producto
+      description: Se envia el ID del producto como parámetro y si existe devuelve los datos del producto.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para realizar el método GET correctamente.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Se encontró un resultado en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/product"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se ha encontrado el producto.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+                    
+    put:
+      tags:
+        - PRODUCTOS
+      summary: Método para actualizar un producto
+      description:  Se envia un ID como parámetro, y si existe se actualiza el producto seleccionado con los datos enviavos a través del request body.
+      requestBody:
+        description: Se envian los datos para actualizar el producto.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestProduct'
+        required: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para realizar el método PUT correctamente.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        201:
+          description: Actualización de producto con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/requestProduct"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se ha encontrado el producto.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+    
+    delete:
+      tags:
+        - PRODUCTOS
+      summary: Método para eliminar un producto
+      description:  Se envia por parámetro el ID del producto para realizar la operación exitosamente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para eliminar el producto.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        204:
+          description: Producto eliminado con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/deleted"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se ha encontrado el producto.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+  #Endpoints de usuarios
+  /users:
+    get:
+      tags:
+        - USUARIOS
+      summary:  Método para obtener todos los usuarios
+      description:  Devuelve un listado con todos los usuarios.
+      responses:
+        200:
+          description: Se encontraron resultados en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/allUsers"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se han encontrado usuarios.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+
+  /users/signup:
+    post:
+      tags:
+        - USUARIOS
+      summary: Método para crear un nuevo usuario
+      description: Se envian los datos a través de un request body y si el request es correcto se crea un nuevo usuario.
+      requestBody:
+        description: Se envian los datos para crear un nuevo usuario.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestUser'
+        required: true
+      responses:
+        201:
+          description: El usuario se creó satisfactoriamente.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/successRequestUser"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+   
+  /users/login:
+    post:
+      tags:
+        - USUARIOS
+      summary: Método para loguearse
+      description: Se envian los datos a través de un request body y si el request es correcto se recibe la respuesta.
+      requestBody:
+        description: Se envian los datos para loguearse.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestUserNameAndPassword'
+        required: true
+      responses:
+        200:
+          description: Login exitoso.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/successLogin"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError" 
+    
+  /users/{userName}/myinfo:
+    get:
+      tags:
+        - USUARIOS
+      summary: Método para obtener un solo ususario
+      description: Se envia el username del usuario como parámetro y si existe devuelve los datos del usuario.
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: Username necesario para realizar el método GET correctamente.
+          style: simple
+          schema:
+            type: string
+      responses:
+        200:
+          description: Se encontró un resultado en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        404:
+          description: No se ha encontrado el usuario.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+  /users/admin/{userName}/myinfo:
+    get:
+      tags:
+        - USUARIOS
+      summary: Método para obtener un solo ususario administrador
+      description: Se envia el username del usuario administrador como parámetro y si existe devuelve los datos del usuario.
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: Username necesario para realizar el método GET correctamente.
+          style: simple
+          schema:
+            type: string
+      responses:
+        200:
+          description: Se encontró un resultado en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/userAdmin"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        404:
+          description: No se ha encontrado el usuario.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+              
+  /users/{userName}:
+    put:
+      tags:
+        - USUARIOS
+      summary: Método para actualizar un usuario
+      description:  Se envia un username como parámetro, y si existe se envian los datos a actualizar a través de un request body.
+      requestBody:
+        description: Se envian los datos para actualizar el usuario.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestUser'
+        required: true
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: Username necesario para realizar el método PUT correctamente.
+          style: simple
+          schema:
+            type: string
+      responses:
+        201:
+          description: Actualización de usuario con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/requestUser"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+    
+  /users/{id}:
+    delete:
+      tags:
+        - USUARIOS
+      summary: Método para eliminar un usuario
+      description:  Se envia por parámetro el ID del usuario para realizar la operación.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para eliminar el usuario.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        204:
+          description: Ususario eliminado con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/deleted"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+    
+  #Endpoints de pedidos
+  /orders:
+    get:
+      tags:
+        - PEDIDOS
+      summary: Método para obtener todos los pedidos
+      description: Devuelve un listado con todos los pedidos.
+      responses:
+        200:
+          description: Se encontraron resultados en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/allOrders"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se han encontrado pedidos.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+                    
+    post:
+      tags:
+        - PEDIDOS
+      summary: Método para crear un nuevo pedido
+      description: Se envian los datos a través de un request body y si el request es correcto se crea un nuevo pedido.
+      requestBody:
+        description: Se envian los datos para crear un nuevo pedido.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestOrderProduct'
+        required: true
+      responses:
+        201:
+          description: El pedido se creó satisfactoriamente.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/successRequestOrder"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+                    
+  /orders/{id}:
+    get:
+      tags:
+        - PEDIDOS
+      summary: Método para obtener un solo pedido
+      description: Se envia el ID del pedido como parámetro y si existe devuelve los datos del pedido.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para realizar el método GET correctamente.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Se encontró un resultado en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/orderById"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se han encontrado pedidos.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+    patch:
+      tags:
+        - PEDIDOS
+      summary: Método para actualizar un pedido
+      description:  Se envia un ID como parámetro, y si existe permite actualizar el estado del pedido a través de un request body.
+      requestBody:
+        description: Se envian los datos para actualizar el estado del pedido.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestOrderPatch'
+        required: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para realizar el método PATCH correctamente.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Actualización del estado con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/requestOrderPatch"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+    delete:
+      tags:
+        - PEDIDOS
+      summary: Método para eliminar un pedido
+      description:  Se envia por parámetro el ID del pedido para realizar la operación exitosamente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID necesario para eliminar el pedido.
+          style: simple
+          schema:
+            type: number
+            format: int64
+      responses:
+        204:
+          description: Pedido eliminado con éxito.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/deleted"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+  /orders/{userName}/myOrder:
+    get:
+      tags:
+        - PEDIDOS
+      summary: Método para obtener un pedido por usuario
+      description: Se envia el userName del usuario como parámetro y si existe devuelve los datos del pedido.
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: Username necesario para realizar el método GET correctamente.
+          style: simple
+          schema:
+            type: string
+      responses:
+        200:
+          description: Se encontró un resultado en la búsqueda.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/orderByUserName"
+        400:
+          description: El servidor no pudo comprender la solicitud debido a una sintaxis no válida.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/badRequest"
+        401:
+          description: Sin autorización.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        404:
+          description: No se han encontrado pedidos.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notFound"
+        500:
+          description: Error interno en el servidor.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/serverError"
+  
+components:
+  schemas:
+  
+    # Schemas de productos
+  
+    allProducts:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 200
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+          type: array
+          items:
+            "$ref": "#/components/schemas/product"
+            
+    product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Hamburguesa clásica
+        price:
+          type: integer
+          example: 350
+        
+    productOrder:
+      type: object
+      required:
+        - name
+        - quantity
+      properties:
+        name:
+          type: string
+          example: Hamburguesa clásica
+        quantity:
+          type: integer
+          example: 1
+      
+    requestProduct:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+          example: Hamburguesa clásica
+        price:
+          type: integer
+          example: 350
+    
+    successRequestProduct:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 201
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+            "$ref": "#/components/schemas/requestProduct"
+    
+    # Schemas de usuarios
+    
+    allUsers:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 200
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+          type: array
+          items:
+            "$ref": "#/components/schemas/user"
+  
+    user:
+      type: object
+      required:
+        - id
+        - userName
+        - name
+        - lastname
+        - email
+        - telephone
+        - address
+        - admin
+      properties:
+        id:
+          type: integer
+          example: 1
+        userName:
+          type: string
+          example: john_doe
+        name:
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john@doe.com
+        telephone:
+          type: string
+          example: "11 2700 1122"
+        address:
+          type: string
+          example: "Charcas 2120"
+        admin:
+          type: boolean
+          example: false
+          
+    userAdmin:
+      type: object
+      required:
+        - id
+        - userName
+        - name
+        - lastname
+        - email
+        - telephone
+        - address
+        - admin
+      properties:
+        id:
+          type: integer
+          example: 1
+        userName:
+          type: string
+          example: john_doe
+        name:
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john@doe.com
+        telephone:
+          type: string
+          example: "11 2700 1122"
+        address:
+          type: string
+          example: "Charcas 2120"
+        admin:
+          type: boolean
+          example: true
+          
+    requestUser:
+      type: object
+      required:
+        - userName
+        - name
+        - lastname
+        - email
+        - telephone
+        - address
+        - admin
+      properties:
+        userName:
+          type: string
+          example: john_doe
+        name:
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john@doe.com
+        telephone:
+          type: string
+          example: "11 2700 1122"
+        address:
+          type: string
+          example: "Charcas 2120"
+        admin:
+          type: boolean
+          example: true
+          
+    requestUserNameAndPassword:
+      type: object
+      required:
+        - userName
+        - password
+      properties:
+        userName:
+          type: string
+          example: john_doe
+        password:
+          type: string
+          example: password
+          
+    successLogin:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          example: token
+            
+    successRequestUser:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 201
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+          "$ref": "#/components/schemas/requestUser"
+          
+    # Schemas de pedidos
+    
+    allOrders:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 200
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+          type: array
+          items:
+            "$ref": "#/components/schemas/order"
+            
+    order:
+      type: object
+      required:
+        - id
+        - userName
+        - totalPrice
+        - paymentMethod
+        - address
+        - products
+        - state
+      properties:
+        id:
+          type: integer
+          example: 1
+        userName:
+          type: string
+          example: John Doe
+        totalPrice:
+          type: integer
+          example: 350
+        paymentMethod:
+          type: string
+          example: efectivo
+        address:
+          type: string
+          example: "Charcas 2120"
+        products:
+          type: array
+          items:
+            "$ref": "#/components/schemas/product"
+        state:
+          type: string
+          example: confirmado
+          
+    orderById:
+      type: object
+      required:
+        - id
+        - id_user
+        - description
+        - dateOrder
+        - paymentMethod
+        - price
+        - state
+      properties:
+        id:
+          type: integer
+          example: 1
+        id_user:
+          type: integer
+          example: 1
+        description:
+          type: string
+          example: Hamburguesa clásica x1, sandwich veggie x3
+        dateOrder:
+          type: string
+          example: "2020-10-10"
+        paymentMethod:
+          type: string
+          example: Efectivo
+        price:
+          type: integer
+          example: 1200
+        state:
+          type: string
+          example: Nuevo
+          
+    orderByUserName:
+      type: object
+      required:
+        - state
+        - dateOrder
+        - id
+        - description
+        - paymentMethod
+        - price
+      properties:
+        state:
+          type: string
+          example: Nuevo
+        dateOrder:
+          type: string
+          example: "2020-10-10"
+        id:
+          type: integer
+          example: 1
+        description:
+          type: string
+          example: Hamburguesa clásica x1, Sandwich veggie x3
+        paymentMethod:
+          type: string
+          example: Efectivo
+        price:
+          type: integer
+          example: 1280
+          
+    requestOrderProduct:
+      type: object
+      required:
+        - products
+        - paymentMethod
+      properties:
+        products:
+          type: array
+          items:
+            "$ref": "#/components/schemas/productOrder"
+        paymentMethod:
+          type: string
+          example: Efectivo
+          
+    requestOrderPatch:
+      type: object
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          example: Preparando
+    
+    successRequestOrder:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 201
+        responseMessage:
+          type: string
+          example: Operación exitosa.
+        responseObject:
+            "$ref": "#/components/schemas/requestOrderProduct"
+    
+    # Schemas generales
+    
+    badRequest:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+      properties:
+        httpResponse:
+          type: integer
+          example: 400
+        responseMessage:
+          type: string
+          example: Los datos de entrada no son validos.
+    
+    serverError:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+      properties:
+        httpResponse:
+          type: integer
+          example: 500
+        responseMessage:
+          type: string
+          example: Error interno en el servidor.
+          
+    unauthorized:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+      properties:
+        httpResponse:
+          type: integer
+          example: 401
+        responseMessage:
+          type: string
+          example: No posee los permisos necesarios.
+          
+    notFound:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+      properties:
+        httpResponse:
+          type: integer
+          example: 404
+        responseMessage:
+          type: string
+          example: No se obtuvo una respuesta.
+    
+    deleted:
+      type: object
+      required:
+        - httpResponse
+        - responseMessage
+        - responseObject
+      properties:
+        httpResponse:
+          type: integer
+          example: 204
+        responseMessage:
+          type: string
+          example: Operación exitosa
+        responseObject:
+          type: boolean
+          example: true
+    
+    # -------------------------------------
+      
+tags:
+  - name: PRODUCTOS
+    description:  Endpoints de productos
+  - name: USUARIOS
+    description:  Endpoints de usuarios
+  - name: PEDIDOS
+    description:  Endpoints de pedidos
