@@ -104,12 +104,17 @@ server.delete(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('DELETE FROM products WHERE id = ?', {
-				replacements: [req.params.id],
-				type: connection.QueryTypes.DELETE,
+			.query('DELETE FROM infoorders WHERE id_product= :id', {
+				replacements: {id: req.params.id},
 			})
 			.then(() => {
-				res.status(204).json('Producto eliminado con éxito!');
+				connection
+					.query('DELETE FROM products WHERE id= :id', {
+						replacements: {id: req.params.id},
+					})
+					.then(() => {
+						res.status(204).json('Operación exitosa');
+					});
 			});
 	}
 );
@@ -206,7 +211,7 @@ server.post(
 								}
 							)
 							.then(() => {
-								res.status(200).json('Usuario creado con éxito');
+								res.status(201).json('Usuario creado con éxito');
 							});
 					}
 				});
@@ -256,17 +261,28 @@ server.put(
 );
 
 server.delete(
-	'/users/:userName',
+	'/users/:id',
 	middleware.verifyLogin,
 	middleware.adminPermission,
 	(req, res) => {
 		connection
-			.query('DELETE FROM users WHERE userName = ?', {
-				replacements: [req.params.userName],
-				type: connection.QueryTypes.DELETE,
+			.query('DELETE FROM infoorders WHERE id_order = :id', {
+				replacements: {id: req.params.id},
 			})
 			.then(() => {
-				res.status(204).json('Usuario eliminado con éxito!');
+				connection
+					.query('DELETE FROM orders WHERE id_user= :id', {
+						replacements: {id: req.params.id},
+					})
+					.then(() => {
+						connection
+							.query('DELETE FROM users WHERE id= :id', {
+								replacements: {id: req.params.id},
+							})
+							.then(() => {
+								res.status(204).json('Operación exitosa');
+							});
+					});
 			});
 	}
 );
@@ -380,7 +396,7 @@ server.delete(
 						replacements: {id: req.params.id},
 					})
 					.then(() => {
-						res.status(204);
+						res.status(204).json('Pededio eliminado con éxito');
 					});
 			});
 	}
