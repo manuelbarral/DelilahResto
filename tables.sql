@@ -20,7 +20,7 @@ CREATE TABLE orders(
     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     id_user INT NOT NULL,
     FOREIGN KEY FK_idUser (id_user) REFERENCES users(id),
-    description VARCHAR (150) NOT NULL,
+    description VARCHAR (600) NOT NULL,
     dateOrder DATE NOT NULL,
     paymentMethod VARCHAR(60) NOT NULL,
     price INT NOT NULL,
