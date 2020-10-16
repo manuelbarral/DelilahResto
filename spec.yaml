@@ -847,6 +847,7 @@ components:
       required:
         - id
         - userName
+        - psw
         - name
         - lastname
         - email
@@ -859,16 +860,19 @@ components:
           example: 1
         userName:
           type: string
-          example: john_doe
+          example: janne_doe
+        psw:
+          type: string
+          example: password
         name:
           type: string
-          example: John
+          example: Janne
         lastname:
           type: string
           example: Doe
         email:
           type: string
-          example: john@doe.com
+          example: janne@doe.com
         telephone:
           type: string
           example: "11 2700 1122"
@@ -876,14 +880,15 @@ components:
           type: string
           example: "Charcas 2120"
         admin:
-          type: boolean
-          example: false
+          type: string
+          example: "false"
           
     userAdmin:
       type: object
       required:
         - id
         - userName
+        - psw
         - name
         - lastname
         - email
@@ -897,6 +902,9 @@ components:
         userName:
           type: string
           example: john_doe
+        psw:
+          type: string
+          example: password
         name:
           type: string
           example: John
@@ -913,13 +921,14 @@ components:
           type: string
           example: "Charcas 2120"
         admin:
-          type: boolean
-          example: true
+          type: string
+          example: "true"
           
     requestUser:
       type: object
       required:
         - userName
+        - psw
         - name
         - lastname
         - email
@@ -930,6 +939,9 @@ components:
         userName:
           type: string
           example: john_doe
+        psw:
+          type: string
+          example: password
         name:
           type: string
           example: John
@@ -946,19 +958,19 @@ components:
           type: string
           example: "Charcas 2120"
         admin:
-          type: boolean
-          example: true
+          type: string
+          example: "true"
           
     requestUserNameAndPassword:
       type: object
       required:
         - userName
-        - password
+        - psw
       properties:
         userName:
           type: string
           example: john_doe
-        password:
+        psw:
           type: string
           example: password
           
@@ -1010,36 +1022,43 @@ components:
     order:
       type: object
       required:
-        - id
-        - userName
-        - totalPrice
-        - paymentMethod
-        - address
-        - products
         - state
+        - dateOrder
+        - id
+        - description
+        - paymentMethod
+        - price
+        - name
+        - lastname
+        - address
       properties:
+        state:
+          type: string
+          example: Nuevo
+        dateOrder:
+          type: string
+          example: "2020-10-16"
         id:
           type: integer
           example: 1
-        userName:
+        description:
           type: string
-          example: John Doe
-        totalPrice:
-          type: integer
-          example: 350
+          example: "Hamburguesa clásica x3, Bagel de salmón x2"
         paymentMethod:
           type: string
-          example: efectivo
+          example: Efectivo
+        price:
+          type: integer
+          example: 1670
+        name:
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
         address:
           type: string
           example: "Charcas 2120"
-        products:
-          type: array
-          items:
-            "$ref": "#/components/schemas/product"
-        state:
-          type: string
-          example: confirmado
           
     orderById:
       type: object
@@ -1083,6 +1102,9 @@ components:
         - description
         - paymentMethod
         - price
+        - name
+        - lastname
+        - address
       properties:
         state:
           type: string
@@ -1102,6 +1124,15 @@ components:
         price:
           type: integer
           example: 1280
+        name:
+          type: string
+          example: Janne
+        lastname:
+          type: string
+          example: Doe
+        address:
+          type: string
+          example: "Charcas 2021"
           
     requestOrderProduct:
       type: object
