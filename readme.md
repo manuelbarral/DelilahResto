@@ -48,6 +48,14 @@ Ejecuta `npm install` en la consola para installar todas las dependencias.
 npm install
 ```
 
+> **_*Importante*_**: Crear archivo _.env_ y dentro crear las variables **_HOST_**, **_PORT_** y **_SERVER_KEY_**. El archivo .env debe ser creado ya que este tendrá la contraseña del servidor para crear el token.
+
+```env
+HOST=localhost
+PORT=3000
+SERVER_KEY=passwordDelilahResto
+```
+
 ## Creación de la base de datos
 
 En el archivo _tables.sql_ encontrarás las estructuras de las tablas para la creación de la base de datos.
@@ -98,12 +106,12 @@ Encontrarás los endpoints en el archivo **_*spec.yaml*_**.
   ```json
   {
   	"userName": "john_doe",
-  	"psw": "johndoe1234",
+  	"psw": "password",
   	"name": "John",
   	"lastname": "Doe",
-  	"email": "john@gmail.com",
-  	"telephone": "2235555555",
-  	"address": "address 1234",
+  	"email": "john@doe.com",
+  	"telephone": "115998876",
+  	"address": "Charcas 2120",
   	"admin": "true"
   }
   ```
