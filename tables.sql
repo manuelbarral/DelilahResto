@@ -11,7 +11,7 @@ CREATE TABLE users (
   name VARCHAR(150) NOT NULL,
   lastname VARCHAR(150) NOT NULL,
   email VARCHAR(150) NOT NULL,
-  telephone INT(15) NOT NULL,
+  telephone VARCHAR(150) NOT NULL,
   address VARCHAR(200) NOT NULL,
   admin VARCHAR(5) NOT NULL
 );
