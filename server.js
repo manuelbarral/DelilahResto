@@ -266,7 +266,7 @@ server.delete(
 	middleware.adminPermission,
 	(req, res) => {
 		connection
-			.query('DELETE FROM infoorders WHERE id_order = :id', {
+			.query('DELETE FROM infoorders WHERE id_product = :id', {
 				replacements: {id: req.params.id},
 			})
 			.then(() => {
