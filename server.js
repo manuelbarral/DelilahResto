@@ -104,7 +104,7 @@ server.delete(
 	middleware.verifyIdProducts,
 	(req, res) => {
 		connection
-			.query('DELETE FROM infoorders WHERE id_product= :id', {
+			.query('DELETE FROM infoorders WHERE id= :id', {
 				replacements: {id: req.params.id},
 			})
 			.then(() => {
@@ -266,21 +266,30 @@ server.delete(
 	middleware.adminPermission,
 	(req, res) => {
 		connection
-			.query('DELETE FROM infoorders WHERE id_product = :id', {
+			.query('SELECT * FROM orders WHERE id_user= :id', {
 				replacements: {id: req.params.id},
 			})
-			.then(() => {
+			.then((results) => {
+				let id_order = results[0][0].id;
 				connection
-					.query('DELETE FROM orders WHERE id_user= :id', {
-						replacements: {id: req.params.id},
+					.query('DELETE FROM infoorders WHERE id_order= :id', {
+						replacements: {id: id_order},
 					})
 					.then(() => {
 						connection
-							.query('DELETE FROM users WHERE id= :id', {
+							.query('DELETE FROM orders WHERE id_user= :id', {
 								replacements: {id: req.params.id},
 							})
 							.then(() => {
-								res.status(204).json('Operación exitosa');
+								connection
+									.query('DELETE FROM users WHERE id= :id', {
+										replacements: {id: req.params.id},
+									})
+									.then(() => {
+										res
+											.status(204)
+											.json('Usuario eliminado con éxito');
+									});
 							});
 					});
 			});
