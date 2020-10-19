@@ -19,6 +19,8 @@ paths:
   #Endpoints de productos
   /products:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - PRODUCTOS
       summary: Método para obtener todos los productos
@@ -56,6 +58,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
                     
     post:
+      security:
+      - bearerAuth: []
       tags:
         - PRODUCTOS
       summary: Método para crear un nuevo producto
@@ -84,6 +88,8 @@ paths:
                     
   /products/{id}:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - PRODUCTOS
       summary: Método para obtener un solo producto
@@ -130,6 +136,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
                     
     put:
+      security:
+      - bearerAuth: []
       tags:
         - PRODUCTOS
       summary: Método para actualizar un producto
@@ -183,6 +191,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
     
     delete:
+      security:
+      - bearerAuth: []
       tags:
         - PRODUCTOS
       summary: Método para eliminar un producto
@@ -231,6 +241,8 @@ paths:
   #Endpoints de usuarios
   /users:
     get:
+      security:
+      - bearerAuth: [] 
       tags:
         - USUARIOS
       summary:  Método para obtener todos los usuarios
@@ -341,6 +353,8 @@ paths:
     
   /users/{userName}/myinfo:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - USUARIOS
       summary: Método para obtener un solo ususario
@@ -381,6 +395,8 @@ paths:
   
   /users/admin/{userName}/myinfo:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - USUARIOS
       summary: Método para obtener un solo ususario administrador
@@ -421,6 +437,8 @@ paths:
               
   /users/{userName}:
     put:
+      security:
+      - bearerAuth: []
       tags:
         - USUARIOS
       summary: Método para actualizar un usuario
@@ -468,6 +486,8 @@ paths:
     
   /users/{id}:
     delete:
+      security:
+      - bearerAuth: []
       tags:
         - USUARIOS
       summary: Método para eliminar un usuario
@@ -510,6 +530,8 @@ paths:
   #Endpoints de pedidos
   /orders:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para obtener todos los pedidos
@@ -547,6 +569,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
                     
     post:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para crear un nuevo pedido
@@ -574,6 +598,8 @@ paths:
                     
   /orders/{id}:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para obtener un solo pedido
@@ -620,6 +646,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
   
     patch:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para actualizar un pedido
@@ -661,6 +689,8 @@ paths:
                 "$ref": "#/components/schemas/serverError"
   
     delete:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para eliminar un pedido
@@ -696,6 +726,8 @@ paths:
   
   /orders/{userName}/myOrder:
     get:
+      security:
+      - bearerAuth: []
       tags:
         - PEDIDOS
       summary: Método para obtener un pedido por usuario
@@ -741,6 +773,13 @@ paths:
                 "$ref": "#/components/schemas/serverError"
   
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  
   schemas:
   
     # Schemas de productos
