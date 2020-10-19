@@ -270,6 +270,15 @@ server.delete(
 				replacements: {id: req.params.id},
 			})
 			.then((results) => {
+				if ((results === [], [])) {
+					connection
+						.query('DELETE FROM users WHERE id= :id', {
+							replacements: {id: req.params.id},
+						})
+						.then(() => {
+							res.status(204).json('Usuario eliminado con éxito');
+						});
+				}
 				let id_order = results[0][0].id;
 				connection
 					.query('DELETE FROM infoorders WHERE id_order= :id', {
