@@ -18,6 +18,7 @@ async function saveOrder(req, res) {
 		let reqProducts = req.body.products;
 		reqProducts.forEach(quantityProduct);
 		const orderDescription = ordersProducts.toString();
+		ordersProducts = [];
 		const orderDate = moment().format('YYYY-MM-DD');
 		const userId = await idUser(req);
 		const orderPrice = await price(req);
@@ -52,6 +53,9 @@ async function idUser(req) {
 }
 
 async function price(req) {
+	if (orderPrice != 0) {
+		orderPrice = 0;
+	}
 	const productsList = await connection.query(
 		'SELECT * FROM products',
 		{type: connection.QueryTypes.SELECT}
